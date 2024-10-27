@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "mod.ts"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "mod.ts"
+    }
+  ]
+}
