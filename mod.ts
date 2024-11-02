@@ -1,16 +1,15 @@
 const now = new Date();
-const start = new Date(now.getFullYear(), 0, 0);
-const diff = now.getTime() - start.getTime();
-const oneDay = 1000 * 60 * 60 * 24;
-const dayOfYear = Math.floor(diff / oneDay);
+const dayOfYear = Math.floor(
+  (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) /
+    (1000 * 60 * 60 * 24),
+);
 const progress = (dayOfYear / 365) * 100;
 
-const jsonResponse = (body: object): Response => {
-  return new Response(JSON.stringify(body), {
+const jsonResponse = (body: object): Response =>
+  new Response(JSON.stringify(body), {
     status: 200,
     headers: { "Content-Type": "application/json" },
   });
-};
 
 export const handler = (req: Request): Response => {
   const url = new URL(req.url);
