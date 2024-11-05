@@ -54,3 +54,5 @@ more information.
 
 Feel free to contribute to this project by opening an issue or a pull request. I
 would love to hear your feedback and suggestions!
+
+It is build using [Hono](https://hono.dev) and [Deno](https://deno.com).

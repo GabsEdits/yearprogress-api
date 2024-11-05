@@ -1,3 +1,5 @@
+import { Hono } from "jsr:@hono/hono";
+
 const now = new Date();
 const dayOfYear = Math.floor(
   (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) /
@@ -5,34 +7,27 @@ const dayOfYear = Math.floor(
 );
 const progress = (dayOfYear / 365) * 100;
 
-const jsonResponse = (body: object): Response =>
-  new Response(JSON.stringify(body), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+const app = new Hono();
 
-export const handler = (req: Request): Response => {
-  const url = new URL(req.url);
-  switch (url.pathname) {
-    case "/":
-      return jsonResponse({
-        progress: progress.toFixed(2) + "%",
-        days: dayOfYear,
-        remaining: (100 - progress).toFixed(2) + "%",
-      });
-    case "/days":
-      return jsonResponse({ dayOfYear });
-    case "/precentage":
-      return jsonResponse({ procentage: progress.toFixed(2) + "%" });
-    case "/remaining":
-      return jsonResponse({ remaining: (100 - progress).toFixed(2) + "%" });
-    case "/decimal":
-      return jsonResponse({ decimal: (dayOfYear / 365).toFixed(2) });
-    case "/remaining/days":
-      return jsonResponse({ remaining: 365 - dayOfYear });
-    default:
-      return new Response("Not Found", { status: 404 });
-  }
+const routes = {
+  "/": {
+    progress: progress.toFixed(2) + "%",
+    days: dayOfYear,
+    remaining: (100 - progress).toFixed(2) + "%",
+  },
+  "/days": { dayOfYear },
+  "/precentage": { procentage: progress.toFixed(2) + "%" },
+  "/remaining": { remaining: (100 - progress).toFixed(2) + "%" },
+  "/decimal": { decimal: (dayOfYear / 365).toFixed(2) },
+  "/remaining/days": { remaining: 365 - dayOfYear },
 };
 
-Deno.serve((req: Request) => handler(req));
+Object.entries(routes).forEach(([path, data]) =>
+  app.get(path, (c) => c.json(data))
+);
+
+app.notFound((c) => c.text("Not Found", 404));
+
+Deno.serve(app.fetch);
+
+export { app };

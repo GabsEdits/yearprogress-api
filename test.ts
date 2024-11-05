@@ -1,4 +1,4 @@
-import { handler } from "./mod.ts";
+import { app } from "./mod.ts";
 import { assertEquals, assertStrictEquals } from "jsr:@std/assert";
 
 async function testEndpoint(
@@ -8,7 +8,7 @@ async function testEndpoint(
   expectedBodyTypes: Record<string, string>,
 ) {
   const req = new Request(url);
-  const res = await handler(req);
+  const res = await app.request(req);
   const body = await res.json();
   assertEquals(
     res.status,
@@ -16,7 +16,7 @@ async function testEndpoint(
     `Expected status ${expectedStatus}, got ${res.status}`,
   );
   assertEquals(
-    res.headers.get("Content-Type"),
+    res.headers.get("Content-Type")?.split(";")[0],
     expectedContentType,
     `Expected Content-Type ${expectedContentType}, got ${
       res.headers.get("Content-Type")
@@ -74,8 +74,8 @@ Deno.test("GET /remaining/days", async () => {
   );
 });
 
-Deno.test("GET /notfound", () => {
+Deno.test("GET /notfound", async () => {
   const req = new Request("http://localhost/notfound");
-  const res = handler(req);
+  const res = await app.request(req);
   assertEquals(res.status, 404, `Expected status 404, got ${res.status}`);
 });
