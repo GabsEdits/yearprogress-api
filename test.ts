@@ -5,23 +5,30 @@ async function testEndpoint(
   url: string,
   expectedStatus: number,
   expectedContentType: string,
-  expectedBodyTypes: Record<string, string>,
+  expectedBodyTypes: Record<string, string> = {},
 ) {
   const req = new Request(url);
   const res = await app.request(req);
-  const body = await res.json();
+  let body;
+  try {
+    body = await res.json();
+  } catch (_e) {
+    body = {};
+  }
   assertEquals(
     res.status,
     expectedStatus,
     `Expected status ${expectedStatus}, got ${res.status}`,
   );
-  assertEquals(
-    res.headers.get("Content-Type")?.split(";")[0],
-    expectedContentType,
-    `Expected Content-Type ${expectedContentType}, got ${
-      res.headers.get("Content-Type")
-    }`,
-  );
+  if (expectedContentType) {
+    assertEquals(
+      res.headers.get("Content-Type")?.split(";")[0],
+      expectedContentType,
+      `Expected Content-Type ${expectedContentType}, got ${
+        res.headers.get("Content-Type")
+      }`,
+    );
+  }
   for (const [key, type] of Object.entries(expectedBodyTypes)) {
     assertStrictEquals(
       typeof body[key],
@@ -31,51 +38,70 @@ async function testEndpoint(
   }
 }
 
-Deno.test("GET /", async () => {
-  await testEndpoint("http://localhost/", 200, "application/json", {
-    progress: "string",
-    days: "number",
-    remaining: "string",
-  });
-});
-
-Deno.test("GET /days", async () => {
-  await testEndpoint("http://localhost/days", 200, "application/json", {
-    dayOfYear: "number",
-  });
-});
-
-Deno.test("GET /precentage", async () => {
-  await testEndpoint("http://localhost/precentage", 200, "application/json", {
-    procentage: "string",
-  });
-});
-
-Deno.test("GET /remaining", async () => {
-  await testEndpoint("http://localhost/remaining", 200, "application/json", {
-    remaining: "string",
-  });
-});
-
-Deno.test("GET /decimal", async () => {
-  await testEndpoint("http://localhost/decimal", 200, "application/json", {
-    decimal: "string",
-  });
-});
-
-Deno.test("GET /remaining/days", async () => {
-  await testEndpoint(
-    "http://localhost/remaining/days",
-    200,
-    "application/json",
-    {
-      remaining: "number",
+const testCases: Array<{
+  url: string;
+  expectedStatus: number;
+  expectedContentType: string;
+  expectedBodyTypes: Record<string, string>;
+}> = [
+  {
+    url: "http://localhost/",
+    expectedStatus: 200,
+    expectedContentType: "application/json",
+    expectedBodyTypes: {
+      progress: "string",
+      days: "number",
+      remaining: "string",
     },
-  );
-});
+  },
+  {
+    url: "http://localhost/days",
+    expectedStatus: 200,
+    expectedContentType: "application/json",
+    expectedBodyTypes: { dayOfYear: "number" },
+  },
+  {
+    url: "http://localhost/precentage",
+    expectedStatus: 200,
+    expectedContentType: "application/json",
+    expectedBodyTypes: { procentage: "string" },
+  },
+  {
+    url: "http://localhost/remaining",
+    expectedStatus: 200,
+    expectedContentType: "application/json",
+    expectedBodyTypes: { remaining: "string" },
+  },
+  {
+    url: "http://localhost/decimal",
+    expectedStatus: 200,
+    expectedContentType: "application/json",
+    expectedBodyTypes: { decimal: "string" },
+  },
+  {
+    url: "http://localhost/remaining/days",
+    expectedStatus: 200,
+    expectedContentType: "application/json",
+    expectedBodyTypes: { remaining: "number" },
+  },
+  {
+    url: "http://localhost/notfound",
+    expectedStatus: 404,
+    expectedContentType: "",
+    expectedBodyTypes: {},
+  },
+];
 
-Deno.test("GET /notfound", async () => {
-  const req = new Request("http://localhost/notfound");
-  const res = await app.request(req);
-  assertEquals(res.status, 404, `Expected status 404, got ${res.status}`);
-});
+for (
+  const { url, expectedStatus, expectedContentType, expectedBodyTypes }
+    of testCases
+) {
+  Deno.test(`GET ${url}`, async () => {
+    await testEndpoint(
+      url,
+      expectedStatus,
+      expectedContentType,
+      expectedBodyTypes,
+    );
+  });
+}
