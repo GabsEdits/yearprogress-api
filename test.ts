@@ -50,8 +50,9 @@ const testCases: Array<{
     expectedContentType: "application/json",
     expectedBodyTypes: {
       progress: "string",
-      days: "number",
-      remaining: "string",
+      day: "number",
+      "remaining.percentage": "undefined",
+      "remaining.daysLeft": "undefined",
     },
   },
   {
@@ -61,10 +62,10 @@ const testCases: Array<{
     expectedBodyTypes: { dayOfYear: "number" },
   },
   {
-    url: "http://localhost/precentage",
+    url: "http://localhost/percentage",
     expectedStatus: 200,
     expectedContentType: "application/json",
-    expectedBodyTypes: { procentage: "string" },
+    expectedBodyTypes: { percentage: "string" },
   },
   {
     url: "http://localhost/remaining",
