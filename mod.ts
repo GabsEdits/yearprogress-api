@@ -6,7 +6,11 @@ const dayOfYear = Math.floor(
     (1000 * 60 * 60 * 24),
 );
 const progress = (dayOfYear / 365) * 100;
-const daysInYear = (now.getFullYear() % 4 === 0 && now.getFullYear() % 100 !== 0) || now.getFullYear() % 400 === 0 ? 366 : 365;
+const daysInYear =
+  (now.getFullYear() % 4 === 0 && now.getFullYear() % 100 !== 0) ||
+    now.getFullYear() % 400 === 0
+    ? 366
+    : 365;
 
 const app = new Hono();
 
@@ -23,23 +27,23 @@ const routes = {
   },
   "/days": {
     message: "Current day of the year",
-    dayOfYear
+    dayOfYear,
   },
   "/percentage": {
     message: "Year progress percentage",
-    percentage: progress.toFixed(2) + "%"
+    percentage: progress.toFixed(2) + "%",
   },
   "/remaining": {
     message: "Remaining percentage of the year",
-    remaining: (100 - progress).toFixed(2) + "%"
+    remaining: (100 - progress).toFixed(2) + "%",
   },
   "/decimal": {
     message: "Year progress in decimal",
-    decimal: (dayOfYear / 365).toFixed(2)
+    decimal: (dayOfYear / 365).toFixed(2),
   },
   "/remaining/days": {
     message: "Days remaining in the year",
-    remaining: daysInYear - dayOfYear
+    remaining: daysInYear - dayOfYear,
   },
   "/time": {
     message: "Current server time",
