@@ -47,8 +47,8 @@ and maybe even useful!
 
 ## License
 
-This project is under the Unlicense license. See the [LICENSE](./LICENSE.txt) file for
-more information.
+This project is under the Unlicense license. See the [LICENSE](./LICENSE.txt)
+file for more information.
 
 ## Contributing
 
